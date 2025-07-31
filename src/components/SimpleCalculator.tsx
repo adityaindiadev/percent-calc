@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { calculatePercentage, calculatePercentageOf, calculatePercentageChange, formatNumber } from '../utils/percentageCalculations';
 
 type CalculationType = 'percentage' | 'percentageOf' | 'percentageChange' | 'increaseDecrease';
@@ -13,6 +13,7 @@ const SimpleCalculator: React.FC = () => {
   });
   const [increaseDecreaseType, setIncreaseDecreaseType] = useState<'increase' | 'decrease'>('increase');
   const [result, setResult] = useState<any>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const calculations = [
     {
@@ -77,6 +78,16 @@ const SimpleCalculator: React.FC = () => {
     setValues(prev => ({ ...prev, [key]: value }));
   };
 
+  const scrollToResult = () => {
+    if (resultRef.current) {
+      resultRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
+  };
+
   const handleCalculate = () => {
     const val1 = parseFloat(values.value1);
     const val2 = parseFloat(values.value2);
@@ -111,6 +122,11 @@ const SimpleCalculator: React.FC = () => {
     }
 
     setResult(calculationResult);
+    
+    // Scroll to result after a short delay to ensure the result is rendered
+    setTimeout(() => {
+      scrollToResult();
+    }, 100);
   };
 
   const handleClear = () => {
@@ -245,7 +261,7 @@ const SimpleCalculator: React.FC = () => {
 
         {/* Result */}
         {result && (
-          <div className="result-card animate-fade-in">
+          <div ref={resultRef} className="result-card animate-fade-in">
             <div className="text-center mb-4 md:mb-6">
               <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-2">Result</h3>
               <div className="text-3xl md:text-4xl font-bold text-primary-600">
